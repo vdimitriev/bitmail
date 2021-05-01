@@ -1,0 +1,25 @@
+/*Theme base colors:*/
+* {
+    -fx-background-color: #3a4559;
+    -fx-text-fill: white;
+}
+
+.big {
+    -fx-font-size: 16px;
+}
+
+Button, Label, ChoiceBox, Slider {
+    -fx-text-fill: white;
+}
+
+Button {
+    -fx-background-color: #353b4a;
+}
+
+Button:hover {
+    -fx-background-color: #616c87;
+}
+
+ChoiceBox {
+    
+}
