@@ -1,6 +1,7 @@
 package mk.vedmak.bitmail.controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -12,7 +13,10 @@ import mk.vedmak.bitmail.controller.services.LoginService;
 import mk.vedmak.bitmail.model.EmailAccount;
 import mk.vedmak.bitmail.view.ViewFactory;
 
-public class LoginWindowController extends BaseController {
+import java.net.URL;
+import java.util.ResourceBundle;
+
+public class LoginWindowController extends BaseController implements Initializable {
 
     @FXML
     private Button loginButton;
@@ -37,33 +41,40 @@ public class LoginWindowController extends BaseController {
         if(fieldsAreValid()) {
             EmailAccount emailAccount = new EmailAccount(emailAddressField.getText(), passwordField.getText());
             LoginService loginService = new LoginService(emailAccount, emailManager);
-            EmailLoginResult emailLoginResult = loginService.login();
-            switch(emailLoginResult) {
-                case SUCCESS:
-                    System.out.println("login succesfull !!" + emailAccount);
-                    break;
-                default:
-                    System.out.println("login not succesfull !!");
-            }
+            loginService.start();
+            loginService.setOnSucceeded(event -> {
+                EmailLoginResult emailLoginResult = loginService.getValue();
+                switch(emailLoginResult) {
+                    case SUCCESS:
+                        System.out.println("login succesfull !!" + emailAccount);
+                        viewFactory.showMainWindow();
+                        final Stage stage = (Stage) errorLabel.getScene().getWindow();
+                        viewFactory.closeStage(stage);
+                        return;
+                    default:
+                        System.out.println("login not succesfull !!");
+                        return;
+                }
+            });
         }
-        System.out.println("Login button clicked !!");
-        viewFactory.showMainWindow();
-        final Stage stage = (Stage) errorLabel.getScene().getWindow();
-        viewFactory.closeStage(stage);
     }
 
     private boolean fieldsAreValid() {
-        if(emailAddressField.getText().isEmpty()) {
+        if(emailAddressField.getText().isBlank()) {
             errorLabel.setText("Please fill email");
             return false;
         }
 
-        if(passwordField.getText().isEmpty()) {
-            errorLabel.setText("Please fill email");
+        if(passwordField.getText().isBlank()) {
+            errorLabel.setText("Please fill password");
             return false;
         }
 
         return true;
     }
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+    }
 }

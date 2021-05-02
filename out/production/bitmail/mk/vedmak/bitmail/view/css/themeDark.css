@@ -20,6 +20,18 @@ Button:hover {
     -fx-background-color: #616c87;
 }
 
-ChoiceBox {
-    
+ChoiceBox >* {
+    -fx-background-color: #353b4a;
+}
+
+Slider.axis {
+    -fx-tick-label-fill: white;
+}
+
+Slider.track {
+    -fx-background-color: #353b4a;
+}
+
+Slider.track:hover {
+    -fx-background-color: #616c87;
 }

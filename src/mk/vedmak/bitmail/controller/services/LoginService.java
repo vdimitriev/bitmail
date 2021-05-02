@@ -1,12 +1,14 @@
 package mk.vedmak.bitmail.controller.services;
 
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import mk.vedmak.bitmail.EmailManager;
 import mk.vedmak.bitmail.model.EmailAccount;
 
 import javax.mail.*;
 
 
-public class LoginService {
+public class LoginService extends Service<EmailLoginResult> {
 
     EmailAccount emailAccount;
     EmailManager emailManager;
@@ -16,7 +18,7 @@ public class LoginService {
         this.emailManager = emailManager;
     }
 
-    public EmailLoginResult login() {
+    private EmailLoginResult login() {
         System.out.println("Login method called in login service.");
         Authenticator authenticator = new Authenticator() {
             @Override
@@ -26,6 +28,7 @@ public class LoginService {
         };
 
         try {
+            //Thread.sleep(5000);
             Session session = Session.getInstance(emailAccount.getProperties(), authenticator);
             Store store = session.getStore("imaps");
             store.connect(emailAccount.getProperties().getProperty("incomingHost"), emailAccount.getAddress(), emailAccount.getPassword());
@@ -45,5 +48,15 @@ public class LoginService {
             ex.printStackTrace();
             return EmailLoginResult.FAILED_BY_UNEXPECTED_ERROR;
         }
+    }
+
+    @Override
+    protected Task<EmailLoginResult> createTask() {
+        return new Task<>() {
+            @Override
+            protected EmailLoginResult call() {
+                return login();
+            }
+        };
     }
 }
