@@ -22,7 +22,7 @@ public class ViewFactory {
         activeStages = new ArrayList<>();
     }
 
-    private ColorTheme colorTheme = ColorTheme.DARK;
+    private ColorTheme colorTheme = ColorTheme.DEFAULT;
     private FontSize fontSize = FontSize.MEDIUM;
 
     public void showLoginWindow() {
