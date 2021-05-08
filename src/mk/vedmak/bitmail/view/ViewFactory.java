@@ -5,10 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import mk.vedmak.bitmail.EmailManager;
-import mk.vedmak.bitmail.controller.BaseController;
-import mk.vedmak.bitmail.controller.LoginWindowController;
-import mk.vedmak.bitmail.controller.MainWindowController;
-import mk.vedmak.bitmail.controller.OptionsWindowController;
+import mk.vedmak.bitmail.controller.*;
 
 import java.util.ArrayList;
 
@@ -16,6 +13,7 @@ public class ViewFactory {
 
     private EmailManager emailManager;
     private ArrayList<Stage> activeStages;
+    private boolean mainViewInitialized = false;
 
     public ViewFactory(EmailManager emailManager) {
         this.emailManager = emailManager;
@@ -33,11 +31,18 @@ public class ViewFactory {
     public void showMainWindow() {
         final BaseController controller = new MainWindowController(emailManager, this, "MainWindow.fxml");
         initStage(controller);
+        mainViewInitialized = true;
     }
 
     public void showOptionsWindow() {
         System.out.println("options window called");
         final BaseController controller = new OptionsWindowController(emailManager, this, "OptionsWindow.fxml");
+        initStage(controller);
+    }
+
+    public void showComposeMessageWindow() {
+        System.out.println("compose message window called");
+        final BaseController controller = new ComposeMessageController(emailManager, this, "ComposeMessageWindow.fxml");
         initStage(controller);
     }
 
@@ -91,5 +96,9 @@ public class ViewFactory {
 
             scene.getStylesheets().add(getClass().getResource(FontSize.getCssPath(fontSize)).toExternalForm());
         }
+    }
+
+    public boolean isMainViewInitialized() {
+        return mainViewInitialized;
     }
 }

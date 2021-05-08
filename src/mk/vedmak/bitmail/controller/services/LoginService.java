@@ -29,10 +29,12 @@ public class LoginService extends Service<EmailLoginResult> {
 
         try {
             //Thread.sleep(5000);
-            Session session = Session.getInstance(emailAccount.getProperties(), authenticator);
-            Store store = session.getStore("imaps");
+            final Session session = Session.getInstance(emailAccount.getProperties(), authenticator);
+            emailAccount.setSession(session);
+            final Store store = session.getStore("imaps");
             store.connect(emailAccount.getProperties().getProperty("incomingHost"), emailAccount.getAddress(), emailAccount.getPassword());
             emailAccount.setStore(store);
+            emailManager.addEmailAccount(emailAccount);
             return EmailLoginResult.SUCCESS;
         } catch(AuthenticationFailedException e) {
             e.printStackTrace();

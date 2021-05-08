@@ -9,4 +9,5 @@ module bitmail {
     opens mk.vedmak.bitmail;
     opens mk.vedmak.bitmail.view;
     opens mk.vedmak.bitmail.controller;
+    opens mk.vedmak.bitmail.model;
 }
