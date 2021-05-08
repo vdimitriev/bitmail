@@ -4,10 +4,16 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import mk.vedmak.bitmail.model.EmailAccount;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.*;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EmailSenderService extends Service<EmailSendingResult> {
 
@@ -15,12 +21,14 @@ public class EmailSenderService extends Service<EmailSendingResult> {
     private String subject;
     private String recipient;
     private String content;
+    private List<File> attachments;
 
-    public EmailSenderService(EmailAccount emailAccount, String subject, String recipient, String content) {
+    public EmailSenderService(EmailAccount emailAccount, String subject, String recipient, String content, List<File> attachments) {
         this.emailAccount = emailAccount;
         this.subject = subject;
         this.recipient = recipient;
         this.content = content;
+        this.attachments = attachments;
     }
 
     @Override
@@ -36,11 +44,22 @@ public class EmailSenderService extends Service<EmailSendingResult> {
                     mimeMessage.setSubject(subject);
 
                     //Set the content
-                    final Multipart mimeMultipart = new MimeMultipart();
+                    final Multipart multipart = new MimeMultipart();
                     final BodyPart messageBodyPart = new MimeBodyPart();
                     messageBodyPart.setContent(content, "text/html");
-                    mimeMultipart.addBodyPart(messageBodyPart);
-                    mimeMessage.setContent(mimeMultipart);
+                    multipart.addBodyPart(messageBodyPart);
+                    mimeMessage.setContent(multipart);
+
+                    //Add attachments
+                    if(attachments.size() > 0) {
+                        for(File file : attachments) {
+                            MimeBodyPart mbp = new MimeBodyPart();
+                            DataSource source = new FileDataSource(file.getAbsolutePath());
+                            mbp.setDataHandler(new DataHandler(source));
+                            mbp.setFileName(file.getName());
+                            multipart.addBodyPart(mbp);
+                        }
+                    }
 
                     //Sending the message
                     final Transport transport = emailAccount.getSession().getTransport();
@@ -89,5 +108,13 @@ public class EmailSenderService extends Service<EmailSendingResult> {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public List<File> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<File> attachments) {
+        this.attachments = attachments;
     }
 }

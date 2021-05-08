@@ -9,6 +9,7 @@ import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.internet.MimeBodyPart;
 import java.io.IOException;
 
 public class MessageRendererService extends Service {
@@ -56,24 +57,38 @@ public class MessageRendererService extends Service {
             stringBuffer.append(message.getContent().toString());
         } else if(isMultipartType(contentType)) {
             Multipart multipart = (Multipart) message.getContent();
-            for(int i = multipart.getCount() - 1; i >= 0; i--) {
-                BodyPart bodyPart = multipart.getBodyPart(i);
-                String bodyPartContentType = bodyPart.getContentType();
-                if(isSimpleType(bodyPartContentType)) {
-                    stringBuffer.append(bodyPart.getContent().toString());
-                }
+            loadMultipart(multipart, stringBuffer);
+        }
+    }
+
+    private void loadMultipart(Multipart multipart, StringBuffer stringBuffer) throws MessagingException, IOException {
+        for(int i = multipart.getCount() - 1; i >= 0; i--) {
+            BodyPart bodyPart = multipart.getBodyPart(i);
+            String contentType = bodyPart.getContentType();
+            if(isSimpleType(contentType)) {
+                stringBuffer.append(bodyPart.getContent().toString());
+            } else if(isMultipartType(contentType)) {
+                Multipart mp = (Multipart) bodyPart.getContent();
+                loadMultipart(mp, stringBuffer);
+            } else if(!isTextPlain(contentType)) {
+                MimeBodyPart mbp = (MimeBodyPart) bodyPart;
+                emailMessage.addAttachment(mbp);
             }
         }
     }
 
+    private boolean isTextPlain(String contentType) {
+        return contentType.contains("TEXT/PLAIN");
+    }
+
+    private boolean isImageType(String contentType) {
+        return contentType.contains("IMAGE/PNG");
+    }
+
     private boolean isSimpleType(String contentType) {
-        if(contentType.contains("TEXT/HTML") ||
+        return contentType.contains("TEXT/HTML") ||
             contentType.contains("mixed") ||
-            contentType.contains("text")) {
-            return true;
-        } else {
-            return false;
-        }
+            contentType.contains("text");
     }
 
     private boolean isMultipartType(String contentType) {

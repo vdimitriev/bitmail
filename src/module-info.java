@@ -5,6 +5,7 @@ module bitmail {
     requires javafx.web;
     requires activation;
     requires java.mail;
+    requires java.desktop;
 
     opens mk.vedmak.bitmail;
     opens mk.vedmak.bitmail.view;

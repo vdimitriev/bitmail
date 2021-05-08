@@ -46,6 +46,11 @@ public class ViewFactory {
         initStage(controller);
     }
 
+    public void showEmailDetailsWindow() {
+        final BaseController controller = new EmailDetailsController(emailManager, this, "EmailDetailsWindow.fxml");
+        initStage(controller);
+    }
+
     public void closeStage(Stage stageToClose) {
         stageToClose.close();
         activeStages.remove(stageToClose);
